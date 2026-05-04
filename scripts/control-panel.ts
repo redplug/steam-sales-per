@@ -1,4 +1,4 @@
-﻿import http from "node:http";
+import http from "node:http";
 import { spawn } from "node:child_process";
 import { normalizeThreshold } from "../src/filter/threshold.js";
 import { DEFAULT_FILTER_OPTIONS, type FilterOptions } from "../src/filter/filterOptions.js";
@@ -14,45 +14,48 @@ let latestStatus = "Starting...";
 const UI_TEXT = {
   koreana: {
     title: "Steam 할인율 필터",
+    language: "언어",
     enable: "필터 사용",
     threshold: "최소 할인율",
     showUnknown: "할인율 없는 제품 보이기",
     showOwned: "이미 구매한 제품 보이기",
     showDlc: "DLC 제품 보이기",
-    apply: "적용",
     loading: "불러오는 중...",
     active: "필터 적용 중",
     disabled: "필터 꺼짐. 모든 제품이 표시됩니다.",
     applying: "필터 적용 중...",
-    restoring: "필터 꺼짐. 모든 제품을 다시 표시합니다."
+    restoring: "필터 꺼짐. 모든 제품을 다시 표시합니다.",
+    invalidThreshold: "할인율은 0부터 100 사이로 입력해주세요."
   },
   english: {
     title: "Steam Sale Percent Filter",
+    language: "Language",
     enable: "Enable filter",
     threshold: "Minimum discount percent",
     showUnknown: "Show products without discount percent",
     showOwned: "Show already owned products",
     showDlc: "Show DLC products",
-    apply: "Apply",
     loading: "Loading...",
     active: "Filter active",
     disabled: "Filter disabled. All products are visible.",
     applying: "Applying filter...",
-    restoring: "Filter disabled. Restoring all products..."
+    restoring: "Filter disabled. Restoring all products...",
+    invalidThreshold: "Enter a discount percent from 0 to 100."
   },
   japanese: {
     title: "Steam 割引率フィルター",
+    language: "言語",
     enable: "フィルターを有効化",
     threshold: "最小割引率",
     showUnknown: "割引率のない製品を表示",
     showOwned: "購入済み製品を表示",
     showDlc: "DLC 製品を表示",
-    apply: "適用",
     loading: "読み込み中...",
     active: "フィルター適用中",
     disabled: "フィルター無効。すべての製品を表示中。",
     applying: "フィルターを適用中...",
-    restoring: "フィルター無効。すべての製品を再表示中。"
+    restoring: "フィルター無効。すべての製品を再表示中。",
+    invalidThreshold: "割引率は 0 から 100 の間で入力してください。"
   }
 } as const;
 let cleaning = false;
@@ -73,7 +76,7 @@ const server = http.createServer(async (req, res) => {
     const next = JSON.parse(body) as Partial<FilterOptions>;
     const threshold = normalizeThreshold(String(next.threshold ?? currentOptions.threshold));
     if (!threshold.ok) {
-      return sendJson(res, { ok: false, error: threshold.error }, 400);
+      return sendJson(res, { ok: false, error: threshold.error, status: t().invalidThreshold }, 400);
     }
 
     currentOptions = {
@@ -168,74 +171,103 @@ function renderHtml(): string {
     main { max-width: 520px; margin: 40px auto; padding: 24px; border: 1px solid #333; background: #181818; }
     h1 { margin: 0 0 20px; font-size: 22px; }
     label { display: block; margin: 14px 0; }
-    input[type="number"] { width: 96px; padding: 8px; background: #222; color: #fff; border: 1px solid #555; }
+    input[type="number"], select { width: 160px; padding: 8px; background: #222; color: #fff; border: 1px solid #555; }
+    input[type="number"] { width: 96px; }
     input[type="checkbox"] { transform: scale(1.2); margin-right: 8px; }
-    button { margin-top: 16px; padding: 10px 14px; background: #66c0f4; border: 0; color: #111; font-weight: 700; cursor: pointer; }
-    .language { display: flex; gap: 8px; margin: 0 0 18px; }
-    .language button { margin: 0; background: #333; color: #eee; border: 1px solid #555; }
-    .language button.active { background: #66c0f4; color: #111; border-color: #66c0f4; }
     #status { margin-top: 18px; color: #9fd5ff; }
   </style>
 </head>
 <body>
   <main>
     <h1 data-i18n="title">${text.title}</h1>
-    <div class="language">
-      <button type="button" data-language="koreana" class="${currentOptions.language === "koreana" ? "active" : ""}">한국어</button>
-      <button type="button" data-language="english" class="${currentOptions.language === "english" ? "active" : ""}">English</button>
-      <button type="button" data-language="japanese" class="${currentOptions.language === "japanese" ? "active" : ""}">日本語</button>
-    </div>
+    <label><span data-i18n="language">${text.language}</span><br>
+      <select id="language">
+        <option value="koreana" ${currentOptions.language === "koreana" ? "selected" : ""}>한국어</option>
+        <option value="english" ${currentOptions.language === "english" ? "selected" : ""}>English</option>
+        <option value="japanese" ${currentOptions.language === "japanese" ? "selected" : ""}>日本語</option>
+      </select>
+    </label>
     <label><input id="enabled" type="checkbox" ${currentOptions.enabled ? "checked" : ""} /><span data-i18n="enable">${text.enable}</span></label>
     <label><span data-i18n="threshold">${text.threshold}</span><br><input id="threshold" type="number" min="0" max="100" value="${currentOptions.threshold}" /></label>
     <label><input id="showUnknown" type="checkbox" ${currentOptions.showUnknown ? "checked" : ""} /><span data-i18n="showUnknown">${text.showUnknown}</span></label>
     <label><input id="showOwned" type="checkbox" ${currentOptions.showOwned ? "checked" : ""} /><span data-i18n="showOwned">${text.showOwned}</span></label>
     <label><input id="showDlc" type="checkbox" ${currentOptions.showDlc ? "checked" : ""} /><span data-i18n="showDlc">${text.showDlc}</span></label>
-    <button id="apply" data-i18n="apply">${text.apply}</button>
     <p id="status">${text.loading}</p>
   </main>
   <script>
     const text = ${JSON.stringify(UI_TEXT)};
+    const controls = {
+      language: document.getElementById('language'),
+      enabled: document.getElementById('enabled'),
+      threshold: document.getElementById('threshold'),
+      showUnknown: document.getElementById('showUnknown'),
+      showOwned: document.getElementById('showOwned'),
+      showDlc: document.getElementById('showDlc'),
+      status: document.getElementById('status')
+    };
     let language = ${JSON.stringify(currentOptions.language)};
+    let applyTimer;
+    let requestId = 0;
 
     function setLanguage(nextLanguage) {
       language = nextLanguage;
+      controls.language.value = nextLanguage;
       const labels = text[language];
       for (const [key, value] of Object.entries(labels)) {
         for (const element of document.querySelectorAll('[data-i18n="' + key + '"]')) {
           element.textContent = value;
         }
       }
-      for (const button of document.querySelectorAll('[data-language]')) {
-        button.classList.toggle('active', button.dataset.language === language);
-      }
       document.documentElement.lang = language === 'koreana' ? 'ko' : language === 'japanese' ? 'ja' : 'en';
     }
 
-    async function apply() {
-      const payload = {
-        enabled: document.getElementById('enabled').checked,
-        threshold: Number(document.getElementById('threshold').value),
+    function readPayload() {
+      return {
+        enabled: controls.enabled.checked,
+        threshold: Number(controls.threshold.value),
         language,
-        showUnknown: document.getElementById('showUnknown').checked,
-        showOwned: document.getElementById('showOwned').checked,
-        showDlc: document.getElementById('showDlc').checked
+        showUnknown: controls.showUnknown.checked,
+        showOwned: controls.showOwned.checked,
+        showDlc: controls.showDlc.checked
       };
+    }
+
+    async function apply() {
+      if (controls.threshold.value.trim() === '') {
+        controls.status.textContent = text[language].invalidThreshold;
+        return;
+      }
+
+      const payload = readPayload();
+      const id = ++requestId;
+      controls.status.textContent = payload.enabled ? text[language].applying : text[language].restoring;
       const res = await fetch('/settings', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(payload) });
       const json = await res.json();
-      document.getElementById('status').textContent = json.status || json.error || 'updated';
+      if (id !== requestId) return;
+      controls.status.textContent = json.status || json.error || 'updated';
     }
+
+    function scheduleApply(delay = 250) {
+      clearTimeout(applyTimer);
+      applyTimer = setTimeout(() => void apply(), delay);
+    }
+
     async function poll() {
       const res = await fetch('/status');
       const json = await res.json();
-      document.getElementById('status').textContent = json.status;
+      controls.status.textContent = json.status;
     }
-    for (const button of document.querySelectorAll('[data-language]')) {
-      button.addEventListener('click', async () => {
-        setLanguage(button.dataset.language);
-        await apply();
-      });
+
+    controls.language.addEventListener('change', () => {
+      setLanguage(controls.language.value);
+      void apply();
+    });
+    controls.threshold.addEventListener('input', () => scheduleApply());
+    controls.threshold.addEventListener('change', () => scheduleApply(0));
+    for (const element of [controls.enabled, controls.showUnknown, controls.showOwned, controls.showDlc]) {
+      element.addEventListener('change', () => void apply());
     }
-    document.getElementById('apply').addEventListener('click', apply);
+
     setLanguage(language);
     setInterval(poll, 1500);
     poll();

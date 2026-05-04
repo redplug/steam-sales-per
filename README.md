@@ -12,7 +12,7 @@
 - 할인율이 없는 상품 표시/숨김
 - 이미 구매한 상품 표시/숨김
 - DLC 상품 표시/숨김
-- 한국어/영어/일본어 UI 전환
+- 한국어/영어/일본어 UI 언어 선택
 - 언어 전환 시 Steam Store 페이지 언어도 함께 변경
 - Steam 설치 경로 자동 탐색
 - Steam을 `-cef-enable-debugging` 옵션으로 자동 실행 시도
@@ -22,7 +22,7 @@
 
 1. GitHub Releases에서 `steam-sales-per.exe`를 다운로드합니다.
 2. exe 파일을 실행합니다.
-3. 브라우저에 열리는 설정 화면에서 할인율과 체크박스를 조정합니다.
+3. 브라우저에 열리는 설정 화면에서 할인율, 체크박스, 언어 옵션을 조정합니다. 변경 사항은 적용 버튼 없이 바로 반영됩니다.
 4. Steam Store 페이지를 열면 필터가 자동 적용됩니다.
 
 기본값:
@@ -67,7 +67,7 @@ This project started as a personal side project and was built through a vibe-cod
 - Toggle products without a discount percentage
 - Toggle already owned products
 - Toggle DLC products
-- Korean/English/Japanese UI language toggle
+- Korean/English/Japanese UI language selector
 - Steam Store page language changes together with the UI language
 - Automatic Steam install path detection
 - Attempts to launch Steam with `-cef-enable-debugging`
@@ -77,7 +77,7 @@ This project started as a personal side project and was built through a vibe-cod
 
 1. Download `steam-sales-per.exe` from GitHub Releases.
 2. Run the exe.
-3. Use the settings page opened in your browser.
+3. Use the settings page opened in your browser. Changes are applied immediately without an Apply button.
 4. Open a Steam Store page; the filter is applied automatically.
 
 Defaults:
