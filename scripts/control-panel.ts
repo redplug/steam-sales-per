@@ -128,15 +128,34 @@ async function ensureSteamLaunched(): Promise<void> {
     return;
   }
 
-  try {
-    const response = await fetch("http://127.0.0.1:8080/json/list");
-    if (response.ok) return;
-  } catch {
-    // Launch below.
-  }
+  if (await isSteamDebugEndpointReady()) return;
 
   launchSteamWithCefDebugging(steamExe);
-  latestStatus = "Launched Steam with CEF debugging.";
+  latestStatus = "Launching Steam with CEF debugging...";
+  if (await waitForSteamDebugEndpoint()) {
+    latestStatus = "Launched Steam with CEF debugging.";
+    return;
+  }
+
+  latestStatus =
+    "Steam debugging is unavailable. Fully exit Steam, then run this app again so it can start Steam with -cef-enable-debugging.";
+}
+
+async function waitForSteamDebugEndpoint(): Promise<boolean> {
+  for (let attempt = 0; attempt < 10; attempt += 1) {
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+    if (await isSteamDebugEndpointReady()) return true;
+  }
+  return false;
+}
+
+async function isSteamDebugEndpointReady(): Promise<boolean> {
+  try {
+    const response = await fetch("http://127.0.0.1:8080/json/list");
+    return response.ok;
+  } catch {
+    return false;
+  }
 }
 
 async function cleanup(): Promise<void> {

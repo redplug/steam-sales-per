@@ -33,6 +33,12 @@
 - 언어: 한국어
 - 최소 할인율: 75%
 
+### Steam 실행 옵션 안내
+
+이 도구는 Steam Store 화면에 접근하기 위해 Steam의 CEF 디버깅 인터페이스가 필요합니다. exe를 실행하면 Steam 설치 경로를 자동으로 찾고 `-cef-enable-debugging` 옵션으로 Steam 실행을 시도합니다.
+
+다만 Steam이 이미 일반 모드로 실행 중이면 이 옵션이 기존 Steam 프로세스에 적용되지 않을 수 있습니다. 이 경우 Steam을 완전히 종료한 뒤 `steam-sales-per.exe`를 다시 실행하면 됩니다. 자동 탐색이 실패한 특수한 환경에서는 사용자가 직접 Steam을 `-cef-enable-debugging` 옵션으로 실행해야 할 수 있습니다.
+
 ### 개발
 
 ```powershell
@@ -87,6 +93,12 @@ Defaults:
 - DLC products: hidden
 - Language: Korean
 - Minimum discount: 75%
+
+### Steam Launch Option
+
+This tool needs Steam's CEF debugging interface to access and adjust the Steam Store view. When the exe starts, it tries to find your Steam installation automatically and launch Steam with `-cef-enable-debugging`.
+
+If Steam is already running normally, the option may not be applied to the existing Steam process. In that case, fully exit Steam and run `steam-sales-per.exe` again. In unusual setups where Steam cannot be found automatically, you may need to start Steam manually with `-cef-enable-debugging`.
 
 ### Development
 
