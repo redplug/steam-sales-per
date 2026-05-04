@@ -1,0 +1,8 @@
+node_modules/
+dist/
+coverage/
+.env
+.agents/
+.gstack-codex-txn/
+AGENTS.md
+npm-debug.log*
