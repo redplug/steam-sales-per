@@ -39,6 +39,8 @@
 
 다만 Steam이 이미 일반 모드로 실행 중이면 이 옵션이 기존 Steam 프로세스에 적용되지 않을 수 있습니다. 이 경우 Steam을 완전히 종료한 뒤 `steam-sales-per.exe`를 다시 실행하면 됩니다. 자동 탐색이 실패한 특수한 환경에서는 사용자가 직접 Steam을 `-cef-enable-debugging` 옵션으로 실행해야 할 수 있습니다.
 
+Steam 실행 여부, Steam 완전 종료 여부, `-cef-enable-debugging` 옵션 적용 여부에 대한 최종 확인과 실행 책임은 사용자에게 있습니다.
+
 ### 개발
 
 ```powershell
@@ -57,7 +59,7 @@ dist\steam-sales-per.exe
 
 ### 주의
 
-이 도구는 Steam 클라이언트의 CEF 디버깅 인터페이스를 이용해 Store 페이지의 표시 상태만 조정합니다. Steam 계정 정보, 쿠키, 결제 정보, 게임 파일을 수집하거나 수정하지 않습니다.
+이 도구는 Steam 클라이언트의 CEF 디버깅 인터페이스를 이용해 Store 페이지의 표시 상태만 조정합니다. Steam 계정 정보, 쿠키, 결제 정보, 게임 파일을 수집하거나 수정하지 않습니다. 사용자는 본인의 환경에서 이 도구를 실행하고 Steam 실행 옵션을 적용하는 것에 대한 책임을 직접 부담합니다.
 
 ---
 
@@ -100,6 +102,8 @@ This tool needs Steam's CEF debugging interface to access and adjust the Steam S
 
 If Steam is already running normally, the option may not be applied to the existing Steam process. In that case, fully exit Steam and run `steam-sales-per.exe` again. In unusual setups where Steam cannot be found automatically, you may need to start Steam manually with `-cef-enable-debugging`.
 
+The user is responsible for confirming whether Steam is running, whether Steam has been fully exited when needed, and whether the `-cef-enable-debugging` option is applied in their own environment.
+
 ### Development
 
 ```powershell
@@ -118,4 +122,4 @@ dist\steam-sales-per.exe
 
 ### Notes
 
-This tool uses Steam's CEF debugging interface to adjust the visible Store page. It does not collect or modify Steam account data, cookies, payment data, or game files.
+This tool uses Steam's CEF debugging interface to adjust the visible Store page. It does not collect or modify Steam account data, cookies, payment data, or game files. Users are responsible for running this tool and applying Steam launch options in their own environment.
