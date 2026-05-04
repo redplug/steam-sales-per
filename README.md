@@ -2,14 +2,16 @@
 
 ## 한국어
 
-`steam-sales-per`는 Windows용 Steam 데스크톱 클라이언트의 Store 화면에서 원하는 할인율 이상의 제품만 보이도록 필터링하는 작은 도구입니다.
+`steam-sales-per`는 Windows용 Steam 데스크톱 클라이언트의 Store 화면에서 원하는 할인율 이상의 상품만 보이도록 필터링하는 작은 도구입니다.
+
+이 프로젝트는 개인 사이드 프로젝트로 시작했으며, 아이디어 정리부터 구현 방향 결정, 코드 작성, 테스트, 배포 준비까지 AI와 함께 빠르게 실험하고 다듬는 바이브 코딩 방식으로 작성되었습니다.
 
 ### 주요 기능
 
 - 원하는 최소 할인율 입력
-- 할인율 없는 제품 표시/숨김
-- 이미 구매한 제품 표시/숨김
-- DLC 제품 표시/숨김
+- 할인율이 없는 상품 표시/숨김
+- 이미 구매한 상품 표시/숨김
+- DLC 상품 표시/숨김
 - 한국어/영어/일본어 UI 전환
 - 언어 전환 시 Steam Store 페이지 언어도 함께 변경
 - Steam 설치 경로 자동 탐색
@@ -25,9 +27,9 @@
 
 기본값:
 
-- 할인율 없는 제품: 숨김
-- 이미 구매한 제품: 숨김
-- DLC 제품: 숨김
+- 할인율이 없는 상품: 숨김
+- 이미 구매한 상품: 숨김
+- DLC 상품: 숨김
 - 언어: 한국어
 - 최소 할인율: 75%
 
@@ -49,13 +51,15 @@ dist\steam-sales-per.exe
 
 ### 주의
 
-이 도구는 Steam 클라이언트의 CEF 디버깅 인터페이스를 이용해 Store 페이지의 표시 상태를 조정합니다. Steam 계정 정보, 쿠키, 결제 정보, 게임 파일은 수집하거나 수정하지 않습니다.
+이 도구는 Steam 클라이언트의 CEF 디버깅 인터페이스를 이용해 Store 페이지의 표시 상태만 조정합니다. Steam 계정 정보, 쿠키, 결제 정보, 게임 파일을 수집하거나 수정하지 않습니다.
 
 ---
 
 ## English
 
 `steam-sales-per` is a small Windows tool that filters the official Steam desktop client's Store page so only products at or above your chosen discount percentage remain visible.
+
+This project started as a personal side project and was built through a vibe-coding workflow: shaping the idea, deciding the implementation path, writing code, testing, and preparing release packaging together with AI in a fast iterative loop.
 
 ### Features
 
