@@ -1,6 +1,6 @@
 {
   "name": "steam-sales-per",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "private": true,
   "type": "module",
   "description": "Filter official Steam client Store sale cards by discount percent.",
@@ -14,8 +14,8 @@
     "watch": "tsx scripts/probe-steam-cdp.ts --watch",
     "watch:75": "tsx scripts/probe-steam-cdp.ts --threshold 75 --watch",
     "ui": "tsx scripts/control-panel.ts",
-    "build": "esbuild scripts/control-panel.ts --bundle --platform=node --format=cjs --outfile=dist/steam-sales-per.cjs --banner:js=\"#!/usr/bin/env node\"",
-    "build:exe": "npm run build && pkg dist/steam-sales-per.cjs --targets node20-win-x64 --output dist/steam-sales-per.exe"
+    "build": "esbuild scripts/control-panel.ts --bundle --minify --platform=node --format=cjs --outfile=dist/steam-sales-per.cjs --banner:js=\"#!/usr/bin/env node\"",
+    "build:exe": "npm run build && pkg dist/steam-sales-per.cjs --targets node20-win-x64 --compress GZip --output dist/steam-sales-per.exe"
   },
   "engines": {
     "node": ">=20"
