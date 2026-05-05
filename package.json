@@ -1,6 +1,6 @@
 {
   "name": "steam-sales-per",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "private": true,
   "type": "module",
   "description": "Filter official Steam client Store sale cards by discount percent.",
