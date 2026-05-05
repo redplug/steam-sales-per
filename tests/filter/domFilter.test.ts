@@ -18,8 +18,7 @@ function strictOptions(): FilterOptions {
     minimumDiscountPercent: 75,
     minimumReviewCount: 500,
     minimumReviewGrade: "very_positive",
-    showUnknownDiscount: false,
-    showUnknownReviews: false
+    showUnknownDiscount: false
   };
 }
 
@@ -32,8 +31,8 @@ describe("applyQualityFilter", () => {
       status: "applied",
       statusKind: "applied_partial",
       scanned: 6,
-      hidden: 5,
-      visible: 1,
+      hidden: 3,
+      visible: 3,
       unknownDiscount: 0,
       unknownReviews: 1,
       partialMetadata: 1,
@@ -41,12 +40,12 @@ describe("applyQualityFilter", () => {
     });
 
     const cards = Array.from(document.querySelectorAll(".search_result_row")) as HTMLElement[];
-    expect(cards[0].style.display).toBe("none");
-    expect(cards[1].style.display).toBe("");
-    expect(cards[2].style.display).toBe("none");
-    expect(cards[3].style.display).toBe("none");
-    expect(cards[4].style.display).toBe("none");
-    expect(cards[5].style.display).toBe("none");
+    expect(cards[0].style.display).toBe("none"); // Budget Pick: discount 50% < 75%
+    expect(cards[1].style.display).toBe("");      // Hero Candidate: passes all filters
+    expect(cards[2].style.display).toBe("none"); // Grade Miss: Mostly Positive < Very Positive
+    expect(cards[3].style.display).toBe("none"); // Count Miss: 12 reviews < 500
+    expect(cards[4].style.display).toBe("");     // Unknown Reviews: no data → permissive show
+    expect(cards[5].style.display).toBe("");     // Partial Metadata: grade passes, count null → show
   });
 
   it("treats zero results as a successful empty state", () => {

@@ -129,7 +129,6 @@ export function buildSummary(options: FilterOptions): string {
       `리뷰 ${options.minimumReviewCount}개+`,
       `${reviewGradeLabel(language, options.minimumReviewGrade)}+`,
       options.showUnknownDiscount ? "미확인 할인율 표시" : "미확인 할인율 숨김",
-      options.showUnknownReviews ? "미확인 리뷰 표시" : "미확인 리뷰 숨김",
       options.showOwned ? "보유 제품 표시" : "보유 제품 숨김",
       options.showDlc ? "DLC 표시" : "DLC 숨김"
     ].join(", ");
@@ -141,7 +140,6 @@ export function buildSummary(options: FilterOptions): string {
       `レビュー ${options.minimumReviewCount}+`,
       `${reviewGradeLabel(language, options.minimumReviewGrade)}+`,
       options.showUnknownDiscount ? "不明な割引を表示" : "不明な割引を非表示",
-      options.showUnknownReviews ? "不明なレビューを表示" : "不明なレビューを非表示",
       options.showOwned ? "購入済みを表示" : "購入済みを非表示",
       options.showDlc ? "DLC を表示" : "DLC を非表示"
     ].join(", ");
@@ -152,7 +150,6 @@ export function buildSummary(options: FilterOptions): string {
     `${options.minimumReviewCount}+ reviews`,
     `${reviewGradeLabel(language, options.minimumReviewGrade)}+`,
     options.showUnknownDiscount ? "unknown discount shown" : "unknown discount hidden",
-    options.showUnknownReviews ? "unknown reviews shown" : "unknown reviews hidden",
     options.showOwned ? "owned shown" : "owned hidden",
     options.showDlc ? "DLC shown" : "DLC hidden"
   ].join(", ");
@@ -164,7 +161,7 @@ function buildStatusMessage(options: FilterOptions, diagnostics: FilterDiagnosti
     return localizedAppliedMessage(options.language, 0);
   }
   if (diagnostics.statusKind === "applied_partial") {
-    return localizedPartialMessage(options.language, diagnostics.partialMetadata + diagnostics.unknownReviews);
+    return localizedAppliedMessage(options.language, diagnostics.visible);
   }
   if (diagnostics.statusKind === "structure_warning") {
     return fallback;
@@ -174,7 +171,7 @@ function buildStatusMessage(options: FilterOptions, diagnostics: FilterDiagnosti
 
 function mapStatusKind(kind: FilterDiagnostics["statusKind"]): PanelStatusKind {
   if (kind === "applied_empty") return "applied_empty";
-  if (kind === "applied_partial") return "applied_partial";
+  if (kind === "applied_partial") return "applied";
   if (kind === "structure_warning") return "structure_warning";
   return "applied";
 }
@@ -195,10 +192,10 @@ function localizedAppliedMessage(language: FilterOptions["language"], visible: n
 
 function localizedPartialMessage(language: FilterOptions["language"], count: number): string {
   if (language === "koreana") {
-    return `주의와 함께 적용되었습니다. 카드 ${count}개는 리뷰 데이터가 불완전해서 미확인 리뷰 규칙을 따랐습니다.`;
+    return `적용되었습니다. 카드 ${count}개는 리뷰 데이터가 불완전해서 이용 가능한 데이터로만 필터링했습니다.`;
   }
   if (language === "japanese") {
-    return `警告付きで適用しました。${count} 件のカードはレビュー情報が不完全だったため、不明レビューのルールを使いました。`;
+    return `適用しました。${count} 件のカードはレビュー情報が不完全だったため、利用可能なデータのみでフィルタリングしました。`;
   }
-  return `Applied with warning. ${count} cards used your unknown-review rule.`;
+  return `Applied. ${count} cards had incomplete review data and were filtered by available data only.`;
 }

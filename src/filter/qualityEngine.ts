@@ -7,7 +7,6 @@ export type CardHideReason =
   | "owned_hidden"
   | "dlc_hidden"
   | "unknown_discount_hidden"
-  | "unknown_reviews_hidden"
   | "below_review_count_floor"
   | "below_review_grade_floor";
 
@@ -52,19 +51,11 @@ export function decideCardVisibility(options: FilterOptions, metadata: CardMetad
     return { visible: false, reviewState, hideReason: "below_discount_floor" };
   }
 
-  if (reviewState !== "known") {
-    return {
-      visible: options.showUnknownReviews,
-      reviewState,
-      hideReason: options.showUnknownReviews ? null : "unknown_reviews_hidden"
-    };
-  }
-
-  if ((metadata.reviewCount ?? 0) < options.minimumReviewCount) {
+  if (metadata.reviewCount !== null && metadata.reviewCount < options.minimumReviewCount) {
     return { visible: false, reviewState, hideReason: "below_review_count_floor" };
   }
 
-  if (!meetsReviewGradeFloor(metadata.reviewGrade, options.minimumReviewGrade)) {
+  if (metadata.reviewGrade !== null && !meetsReviewGradeFloor(metadata.reviewGrade, options.minimumReviewGrade)) {
     return { visible: false, reviewState, hideReason: "below_review_grade_floor" };
   }
 

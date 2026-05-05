@@ -78,7 +78,10 @@ export function extractReviewMetadata(language: FilterLanguage, texts: string[])
 }
 
 export function parseReviewGrade(language: FilterLanguage, text: string): ReviewGrade | null {
-  const normalized = normalizeText(text);
+  // Use only text before first <br> — the grade label is always there,
+  // and the description ("N%가 긍정적입니다") would otherwise cause false positives.
+  const gradeSection = text.split(/<br\s*\/?>/i)[0];
+  const normalized = normalizeText(gradeSection);
   for (const grade of Object.keys(REVIEW_GRADE_SYNONYMS[language]) as ReviewGrade[]) {
     if (REVIEW_GRADE_SYNONYMS[language][grade].some((label) => normalized.includes(normalizeText(label)))) {
       return grade;
@@ -89,6 +92,12 @@ export function parseReviewGrade(language: FilterLanguage, text: string): Review
 
 export function parseReviewCount(language: FilterLanguage, text: string): number | null {
   const normalized = normalizeText(text);
+
+  // Korean Steam tooltip: "이 게임에 대한 사용자 평가 N개 중 M%가 긍정적입니다."
+  if (language === "koreana") {
+    const korMatch = normalized.match(/사용자 평가\s*([\d,. ]+)개/);
+    if (korMatch) return normalizeInteger(korMatch[1]);
+  }
 
   const explicitMatch = normalized.match(/([\d,. ]{1,16})\s*(user reviews|reviews|개의 평가|평가|件のレビュー|レビュー)/i);
   if (explicitMatch) {

@@ -10,7 +10,6 @@ export function buildPanelClientScript(): string {
     minimumReviewCount: document.getElementById("minimumReviewCount"),
     minimumReviewGrade: document.getElementById("minimumReviewGrade"),
     showUnknownDiscount: document.getElementById("showUnknownDiscount"),
-    showUnknownReviews: document.getElementById("showUnknownReviews"),
     showOwned: document.getElementById("showOwned"),
     showDlc: document.getElementById("showDlc"),
     summary: document.getElementById("activeSummary"),
@@ -43,7 +42,6 @@ export function buildPanelClientScript(): string {
       minimumReviewCount: Number(controls.minimumReviewCount.value),
       minimumReviewGrade: controls.minimumReviewGrade.value,
       showUnknownDiscount: controls.showUnknownDiscount.checked,
-      showUnknownReviews: controls.showUnknownReviews.checked,
       showOwned: controls.showOwned.checked,
       showDlc: controls.showDlc.checked
     };
@@ -82,7 +80,6 @@ export function buildPanelClientScript(): string {
     controls.minimumReviewCount.value = viewModel.options.minimumReviewCount;
     controls.minimumReviewGrade.value = viewModel.options.minimumReviewGrade;
     controls.showUnknownDiscount.checked = viewModel.options.showUnknownDiscount;
-    controls.showUnknownReviews.checked = viewModel.options.showUnknownReviews;
     controls.showOwned.checked = viewModel.options.showOwned;
     controls.showDlc.checked = viewModel.options.showDlc;
     controls.summary.textContent = viewModel.summary;
@@ -139,7 +136,7 @@ export function buildPanelClientScript(): string {
   controls.minimumReviewCount.addEventListener("change", () => scheduleManualApply(0));
   controls.minimumReviewGrade.addEventListener("change", () => scheduleManualApply(0));
 
-  for (const element of [controls.enabled, controls.showUnknownDiscount, controls.showUnknownReviews, controls.showOwned, controls.showDlc]) {
+  for (const element of [controls.enabled, controls.showUnknownDiscount, controls.showOwned, controls.showDlc]) {
     element.addEventListener("change", () => {
       pendingPresetId = null;
       void postSettings(readManualPayload());

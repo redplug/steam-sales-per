@@ -19,7 +19,6 @@ export type FilterOptions = {
   minimumReviewCount: number;
   minimumReviewGrade: ReviewGrade;
   showUnknownDiscount: boolean;
-  showUnknownReviews: boolean;
   showOwned: boolean;
   showDlc: boolean;
 };
@@ -47,7 +46,6 @@ export const DEFAULT_FILTER_OPTIONS: FilterOptions = {
   minimumReviewCount: 500,
   minimumReviewGrade: "very_positive",
   showUnknownDiscount: false,
-  showUnknownReviews: false,
   showOwned: false,
   showDlc: false
 };
@@ -74,8 +72,7 @@ export const FILTER_PRESETS: FilterPreset[] = [
       ...DEFAULT_FILTER_OPTIONS,
       minimumDiscountPercent: 60,
       minimumReviewCount: 100,
-      minimumReviewGrade: "mostly_positive",
-      showUnknownReviews: true
+      minimumReviewGrade: "mostly_positive"
     }
   }
 ];
@@ -101,7 +98,6 @@ export function createDisabledFilterOptions(language: FilterLanguage = "koreana"
     minimumReviewCount: 0,
     minimumReviewGrade: "overwhelmingly_negative",
     showUnknownDiscount: true,
-    showUnknownReviews: true,
     showOwned: true,
     showDlc: true
   };
@@ -115,7 +111,6 @@ function isSameFilterOptions(left: FilterOptions, right: FilterOptions): boolean
     left.minimumReviewCount === right.minimumReviewCount &&
     left.minimumReviewGrade === right.minimumReviewGrade &&
     left.showUnknownDiscount === right.showUnknownDiscount &&
-    left.showUnknownReviews === right.showUnknownReviews &&
     left.showOwned === right.showOwned &&
     left.showDlc === right.showDlc
   );

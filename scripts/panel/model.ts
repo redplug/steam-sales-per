@@ -33,7 +33,6 @@ export type SettingsPayload = {
   minimumReviewCount: number;
   minimumReviewGrade: FilterOptions["minimumReviewGrade"];
   showUnknownDiscount: boolean;
-  showUnknownReviews: boolean;
   showOwned: boolean;
   showDlc: boolean;
   presetId?: QualityPresetId;

@@ -264,7 +264,6 @@ export function renderPanelHtml(viewModel: PanelViewModel, sessionToken: string)
       <div class="secondary-grid">
         <label class="toggle"><input id="enabled" type="checkbox" ${viewModel.options.enabled ? "checked" : ""} /><span>${text.enabled}</span></label>
         <label class="toggle"><input id="showUnknownDiscount" type="checkbox" ${viewModel.options.showUnknownDiscount ? "checked" : ""} /><span>${text.showUnknownDiscount}</span></label>
-        <label class="toggle"><input id="showUnknownReviews" type="checkbox" ${viewModel.options.showUnknownReviews ? "checked" : ""} /><span>${text.showUnknownReviews}</span></label>
         <label class="toggle"><input id="showOwned" type="checkbox" ${viewModel.options.showOwned ? "checked" : ""} /><span>${text.showOwned}</span></label>
         <label class="toggle"><input id="showDlc" type="checkbox" ${viewModel.options.showDlc ? "checked" : ""} /><span>${text.showDlc}</span></label>
         <div class="field">

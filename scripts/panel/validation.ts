@@ -51,7 +51,6 @@ export function validateSettingsPayload(payload: unknown, fallbackLanguage: Filt
     {
       enabled: next.enabled,
       showUnknownDiscount: next.showUnknownDiscount,
-      showUnknownReviews: next.showUnknownReviews,
       showOwned: next.showOwned,
       showDlc: next.showDlc
     },
@@ -66,7 +65,6 @@ export function validateSettingsPayload(payload: unknown, fallbackLanguage: Filt
     minimumReviewCount: reviewCount,
     minimumReviewGrade: reviewGrade.value,
     showUnknownDiscount: booleans.value.showUnknownDiscount,
-    showUnknownReviews: booleans.value.showUnknownReviews,
     showOwned: booleans.value.showOwned,
     showDlc: booleans.value.showDlc
   };
@@ -112,7 +110,7 @@ function validateBooleans(
   values: Record<string, unknown>,
   language: FilterLanguage
 ):
-  | { value: { enabled: boolean; showUnknownDiscount: boolean; showUnknownReviews: boolean; showOwned: boolean; showDlc: boolean } }
+  | { value: { enabled: boolean; showUnknownDiscount: boolean; showOwned: boolean; showDlc: boolean } }
   | { error: string } {
   for (const value of Object.values(values)) {
     if (typeof value !== "boolean") {
@@ -124,7 +122,6 @@ function validateBooleans(
     value: values as {
       enabled: boolean;
       showUnknownDiscount: boolean;
-      showUnknownReviews: boolean;
       showOwned: boolean;
       showDlc: boolean;
     }

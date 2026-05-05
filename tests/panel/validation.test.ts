@@ -20,7 +20,6 @@ describe("validateSettingsPayload", () => {
         minimumReviewCount: 500,
         minimumReviewGrade: "great",
         showUnknownDiscount: false,
-        showUnknownReviews: false,
         showOwned: false,
         showDlc: false
       },

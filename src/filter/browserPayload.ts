@@ -76,7 +76,10 @@ export function buildBrowserPayload(options: FilterOptions): string {
     }
 
     function parseReviewGrade(language, text) {
-      const normalized = normalizeText(text);
+      // Use only text before first <br> — the grade label is always there,
+      // and the description ("N%가 긍정적입니다") would otherwise cause false positives.
+      const gradeSection = text.split(/<br\\s*\\/?>/i)[0];
+      const normalized = normalizeText(gradeSection);
       for (const grade of reviewGradeOrder) {
         const labels = reviewGradeLabels[language]?.[grade] || [];
         if (labels.some((label) => normalized.includes(normalizeText(label)))) {
@@ -88,6 +91,12 @@ export function buildBrowserPayload(options: FilterOptions): string {
 
     function parseReviewCount(language, text) {
       const normalized = normalizeText(text);
+      // Korean Steam tooltip: "이 게임에 대한 사용자 평가 N개 중 M%가 긍정적입니다."
+      if (language === "koreana") {
+        const korMatch = normalized.match(/사용자 평가\\s*([\\d,. ]+)개/);
+        if (korMatch) return normalizeInteger(korMatch[1]);
+      }
+      // Japanese Steam tooltip: similar "N件のレビュー中" or explicit patterns
       const explicitMatch = normalized.match(/([\\d,. ]{1,16})\\s*(user reviews|reviews|개의 평가|평가|件のレビュー|レビュー)/i);
       if (explicitMatch) {
         return normalizeInteger(explicitMatch[1]);
@@ -214,13 +223,10 @@ export function buildBrowserPayload(options: FilterOptions): string {
       if (metadata.discountPercent < options.minimumDiscountPercent) {
         return { visible: false, reviewState, hideReason: "below_discount_floor" };
       }
-      if (reviewState !== "known") {
-        return { visible: options.showUnknownReviews, reviewState, hideReason: options.showUnknownReviews ? null : "unknown_reviews_hidden" };
-      }
-      if ((metadata.reviewCount || 0) < options.minimumReviewCount) {
+      if (metadata.reviewCount !== null && metadata.reviewCount < options.minimumReviewCount) {
         return { visible: false, reviewState, hideReason: "below_review_count_floor" };
       }
-      if (!meetsReviewGradeFloor(metadata.reviewGrade, options.minimumReviewGrade)) {
+      if (metadata.reviewGrade !== null && !meetsReviewGradeFloor(metadata.reviewGrade, options.minimumReviewGrade)) {
         return { visible: false, reviewState, hideReason: "below_review_grade_floor" };
       }
       return { visible: true, reviewState, hideReason: null };

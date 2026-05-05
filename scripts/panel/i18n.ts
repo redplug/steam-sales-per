@@ -16,7 +16,6 @@ type PanelCopy = {
   minimumReviewCount: string;
   minimumReviewGrade: string;
   showUnknownDiscount: string;
-  showUnknownReviews: string;
   showOwned: string;
   showDlc: string;
   enabled: string;
@@ -46,7 +45,6 @@ const COPY: Record<FilterLanguage, PanelCopy> = {
     minimumReviewCount: "Minimum reviews",
     minimumReviewGrade: "Minimum review grade",
     showUnknownDiscount: "Show products without recognized discount",
-    showUnknownReviews: "Show products without trusted review data",
     showOwned: "Show already owned products",
     showDlc: "Show DLC products",
     enabled: "Enable filter",
@@ -74,7 +72,6 @@ const COPY: Record<FilterLanguage, PanelCopy> = {
     minimumReviewCount: "최소 리뷰 수",
     minimumReviewGrade: "최소 평가 등급",
     showUnknownDiscount: "할인율을 읽지 못한 제품 보이기",
-    showUnknownReviews: "신뢰할 리뷰 데이터를 읽지 못한 제품 보이기",
     showOwned: "이미 보유한 제품 보이기",
     showDlc: "DLC 제품 보이기",
     enabled: "필터 사용",
@@ -102,7 +99,6 @@ const COPY: Record<FilterLanguage, PanelCopy> = {
     minimumReviewCount: "最小レビュー数",
     minimumReviewGrade: "最小レビュー評価",
     showUnknownDiscount: "割引率を認識できない製品を表示",
-    showUnknownReviews: "信頼できるレビュー情報がない製品を表示",
     showOwned: "購入済み製品を表示",
     showDlc: "DLC 製品を表示",
     enabled: "フィルターを有効化",
