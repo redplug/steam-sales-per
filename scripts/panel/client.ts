@@ -70,6 +70,12 @@ export function buildPanelClientScript(): string {
   }
 
   function applyViewModel(viewModel) {
+    const currentUiLanguage = document.body.dataset.uiLanguage;
+    if (currentUiLanguage && currentUiLanguage !== viewModel.options.language) {
+      window.location.reload();
+      return;
+    }
+
     controls.language.value = viewModel.options.language;
     controls.enabled.checked = viewModel.options.enabled;
     controls.minimumDiscountPercent.value = viewModel.options.minimumDiscountPercent;
@@ -87,6 +93,7 @@ export function buildPanelClientScript(): string {
     controls.emptyHint.textContent = viewModel.emptyHint || "";
     controls.activePreset.textContent = viewModel.activePresetLabel;
     document.body.dataset.activePreset = viewModel.activePresetId || "custom";
+    document.body.dataset.uiLanguage = viewModel.options.language;
     for (const button of document.querySelectorAll("[data-preset-id]")) {
       button.dataset.active = button.dataset.presetId === (viewModel.activePresetId || "") ? "true" : "false";
     }

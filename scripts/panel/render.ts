@@ -214,7 +214,7 @@ export function renderPanelHtml(viewModel: PanelViewModel, sessionToken: string)
     }
   </style>
 </head>
-<body data-session-token="${sessionToken}" data-active-preset="${viewModel.activePresetId ?? "custom"}">
+<body data-session-token="${sessionToken}" data-active-preset="${viewModel.activePresetId ?? "custom"}" data-ui-language="${viewModel.options.language}">
   <main>
     <p class="eyebrow">Steam inside the Steam client</p>
     <h1>${text.title}</h1>
