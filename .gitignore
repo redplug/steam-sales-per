@@ -3,6 +3,7 @@ dist/
 coverage/
 .env
 .agents/
+.gstack/
 .gstack-codex-txn/
 AGENTS.md
 npm-debug.log*

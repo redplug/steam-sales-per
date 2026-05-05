@@ -1,6 +1,11 @@
 import { WebSocket } from "ws";
 import { buildBrowserPayload } from "./browserPayload.js";
-import { DEFAULT_FILTER_OPTIONS, type FilterOptions } from "./filterOptions.js";
+import {
+  DEFAULT_FILTER_OPTIONS,
+  createDisabledFilterOptions,
+  type FilterLanguage,
+  type FilterOptions
+} from "./filterOptions.js";
 
 export type CdpTarget = {
   id: string;
@@ -47,12 +52,12 @@ export function findStoreTargets(targets: CdpTarget[]): CdpTarget[] {
   });
 }
 
-export async function probeAndApplyFilter(thresholdOrOptions: number | FilterOptions, port = 8080): Promise<ProbeResult> {
-  const options = normalizeOptions(thresholdOrOptions);
+export async function probeAndApplyFilter(optionsOrDiscount: number | FilterOptions, port = 8080): Promise<ProbeResult> {
+  const options = normalizeOptions(optionsOrDiscount);
   let targets: CdpTarget[];
   try {
     targets = await fetchTargets(port);
-  } catch (error) {
+  } catch {
     return {
       status: "debug_endpoint_unavailable",
       message: `Steam debugging endpoint unavailable on 127.0.0.1:${port}. Restart Steam with -cef-enable-debugging.`
@@ -63,7 +68,7 @@ export async function probeAndApplyFilter(thresholdOrOptions: number | FilterOpt
   if (!target) {
     return {
       status: "store_target_missing",
-      message: "No Steam Store target found. Open the Steam Store/Specials page in the official Steam client and retry."
+      message: "No Steam Store target found. Open the Steam Store or Specials page in the official Steam client and retry."
     };
   }
 
@@ -84,7 +89,7 @@ export async function probeAndApplyFilter(thresholdOrOptions: number | FilterOpt
   }
 }
 
-export async function clearAllStoreTargets(port = 8080): Promise<void> {
+export async function clearAllStoreTargets(port = 8080, language: FilterLanguage = "koreana"): Promise<void> {
   let targets: CdpTarget[];
   try {
     targets = await fetchTargets(port);
@@ -93,29 +98,18 @@ export async function clearAllStoreTargets(port = 8080): Promise<void> {
   }
 
   const storeTargets = findStoreTargets(targets);
-  await Promise.allSettled(
-    storeTargets.map((target) =>
-      applyFilterToTarget(target, {
-        threshold: 0,
-        enabled: false,
-        language: "koreana",
-        showUnknown: true,
-        showOwned: true,
-        showDlc: true
-      })
-    )
-  );
+  await Promise.allSettled(storeTargets.map((target) => applyFilterToTarget(target, createDisabledFilterOptions(language))));
 }
 
-export async function applyFilterToTarget(target: CdpTarget, thresholdOrOptions: number | FilterOptions): Promise<unknown> {
+export async function applyFilterToTarget(target: CdpTarget, optionsOrDiscount: number | FilterOptions): Promise<unknown> {
   if (!target.webSocketDebuggerUrl) {
     throw new Error("Target has no webSocketDebuggerUrl");
   }
-  return sendRuntimeEvaluate(target.webSocketDebuggerUrl, buildBrowserPayload(normalizeOptions(thresholdOrOptions)));
+  return sendRuntimeEvaluate(target.webSocketDebuggerUrl, buildBrowserPayload(normalizeOptions(optionsOrDiscount)));
 }
 
 export async function watchAndApplyFilter(
-  thresholdOrOptions: number | FilterOptions,
+  optionsOrDiscount: number | FilterOptions,
   options: {
     port?: number;
     intervalMs?: number;
@@ -124,14 +118,14 @@ export async function watchAndApplyFilter(
 ): Promise<never> {
   const port = options.port ?? 8080;
   const intervalMs = options.intervalMs ?? 2000;
-  const filterOptions = normalizeOptions(thresholdOrOptions);
+  const filterOptions = normalizeOptions(optionsOrDiscount);
   const lastPrintByTarget = new Map<string, string>();
 
   for (;;) {
     let targets: CdpTarget[];
     try {
       targets = await fetchTargets(port);
-    } catch (error) {
+    } catch {
       options.onEvent({
         status: "blocked",
         message: `Steam debugging endpoint unavailable on 127.0.0.1:${port}. Restart Steam with -cef-enable-debugging.`
@@ -144,7 +138,7 @@ export async function watchAndApplyFilter(
     if (storeTargets.length === 0) {
       options.onEvent({
         status: "idle",
-        message: "No Steam Store target found. Open Store/Specials in Steam; watcher is still running."
+        message: "No Steam Store target found. Open Store or Specials in Steam; watcher is still running."
       });
       await sleep(intervalMs);
       continue;
@@ -180,11 +174,11 @@ export async function watchAndApplyFilter(
   }
 }
 
-function normalizeOptions(thresholdOrOptions: number | FilterOptions): FilterOptions {
-  if (typeof thresholdOrOptions === "number") {
-    return { threshold: thresholdOrOptions, ...DEFAULT_FILTER_OPTIONS };
+function normalizeOptions(optionsOrDiscount: number | FilterOptions): FilterOptions {
+  if (typeof optionsOrDiscount === "number") {
+    return { ...DEFAULT_FILTER_OPTIONS, minimumDiscountPercent: optionsOrDiscount };
   }
-  return thresholdOrOptions;
+  return optionsOrDiscount;
 }
 
 function sleep(ms: number): Promise<void> {
