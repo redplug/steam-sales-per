@@ -161,7 +161,7 @@ export function buildSummary(options: FilterOptions): string {
 function buildStatusMessage(options: FilterOptions, diagnostics: FilterDiagnostics, fallback: string): string {
   const text = panelCopy(options.language);
   if (diagnostics.statusKind === "applied_empty") {
-    return text.emptyHint;
+    return localizedAppliedMessage(options.language, 0);
   }
   if (diagnostics.statusKind === "applied_partial") {
     return localizedPartialMessage(options.language, diagnostics.partialMetadata + diagnostics.unknownReviews);
