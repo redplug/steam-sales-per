@@ -1,30 +1,35 @@
 import { normalizeThreshold, thresholdErrorMessage } from "../src/filter/threshold.js";
 import { probeAndApplyFilter, watchAndApplyFilter, type WatchEvent } from "../src/filter/steamCdp.js";
-import { DEFAULT_FILTER_OPTIONS, type FilterOptions } from "../src/filter/filterOptions.js";
+import { DEFAULT_FILTER_OPTIONS, type FilterOptions, type ReviewGrade } from "../src/filter/filterOptions.js";
 import { findSteamExe, launchSteamWithCefDebugging } from "../src/steam/steamLocator.js";
 
 const args = parseArgs(process.argv.slice(2));
-const thresholdResult = normalizeThreshold(args.threshold ?? "75");
+const discountResult = normalizeThreshold(args.threshold ?? String(DEFAULT_FILTER_OPTIONS.minimumDiscountPercent));
 const port = Number(args.port ?? "8080");
 const watch = args.watch === "true";
 const noLaunch = args["no-launch"] === "true";
+const reviewCount = Number(args["review-count"] ?? String(DEFAULT_FILTER_OPTIONS.minimumReviewCount));
+const reviewGrade = (args["review-grade"] as ReviewGrade | undefined) ?? DEFAULT_FILTER_OPTIONS.minimumReviewGrade;
 
-if (!thresholdResult.ok) {
+if (!discountResult.ok) {
   printStatus({
     STATUS: "blocked",
     STEAM: "not_checked",
     TARGET: "not_checked",
     FILTER: "not_applied",
-    NEXT: thresholdErrorMessage(thresholdResult.error)
+    NEXT: thresholdErrorMessage(discountResult.error)
   });
   process.exit(1);
 }
 
 const filterOptions: FilterOptions = {
-  threshold: thresholdResult.value,
+  ...DEFAULT_FILTER_OPTIONS,
+  minimumDiscountPercent: discountResult.value,
+  minimumReviewCount: Number.isFinite(reviewCount) && reviewCount >= 0 ? reviewCount : DEFAULT_FILTER_OPTIONS.minimumReviewCount,
+  minimumReviewGrade: reviewGrade,
   enabled: args.disable === "true" ? false : DEFAULT_FILTER_OPTIONS.enabled,
-  language: "koreana",
-  showUnknown: args["show-unknown"] === "true" || DEFAULT_FILTER_OPTIONS.showUnknown,
+  showUnknownDiscount: args["show-unknown-discount"] === "true" || DEFAULT_FILTER_OPTIONS.showUnknownDiscount,
+  showUnknownReviews: args["show-unknown-reviews"] === "true" || DEFAULT_FILTER_OPTIONS.showUnknownReviews,
   showOwned: args["show-owned"] === "true" || DEFAULT_FILTER_OPTIONS.showOwned,
   showDlc: args["show-dlc"] === "true" || DEFAULT_FILTER_OPTIONS.showDlc
 };
@@ -89,7 +94,7 @@ printStatus({
   STEAM: "debug_endpoint_found",
   TARGET: formatTarget(result.target),
   FILTER: formatDiagnostics(result.diagnostics),
-  NEXT: "Review the Steam Store page. Unknown/no-discount cards were hidden and counted as unknown."
+  NEXT: "Review the Steam Store page. Quality rules, unknown-review handling, and diagnostics were applied together."
 });
 
 function parseArgs(argv: string[]): Record<string, string> {
@@ -97,9 +102,12 @@ function parseArgs(argv: string[]): Record<string, string> {
   for (let i = 0; i < argv.length; i += 1) {
     const arg = argv[i];
     if (arg === "--threshold") parsed.threshold = argv[++i];
+    else if (arg === "--review-count") parsed["review-count"] = argv[++i];
+    else if (arg === "--review-grade") parsed["review-grade"] = argv[++i];
     else if (arg === "--port") parsed.port = argv[++i];
     else if (arg === "--watch") parsed.watch = "true";
-    else if (arg === "--show-unknown") parsed["show-unknown"] = "true";
+    else if (arg === "--show-unknown-discount") parsed["show-unknown-discount"] = "true";
+    else if (arg === "--show-unknown-reviews") parsed["show-unknown-reviews"] = "true";
     else if (arg === "--show-owned") parsed["show-owned"] = "true";
     else if (arg === "--show-dlc") parsed["show-dlc"] = "true";
     else if (arg === "--no-launch") parsed["no-launch"] = "true";
@@ -134,7 +142,7 @@ async function ensureSteamDebugEndpoint(port: number): Promise<Record<string, st
     STEAM: `launched ${JSON.stringify(steamExe)}`,
     TARGET: "not_checked",
     FILTER: "not_applied",
-    NEXT: "Steam was launched with -cef-enable-debugging. Open Store/Specials if it is not already open."
+    NEXT: "Steam was launched with -cef-enable-debugging. Open Store or Specials if it is not already open."
   };
 }
 
@@ -153,13 +161,13 @@ function formatDiagnostics(diagnostics: unknown): string {
   if (!diagnostics || typeof diagnostics !== "object") return "applied_no_diagnostics";
   const d = diagnostics as Record<string, unknown>;
   return [
-    `threshold=${d.threshold}`,
+    `status_kind=${d.statusKind}`,
     `scanned=${d.scanned}`,
     `hidden=${d.hidden}`,
     `visible=${d.visible}`,
-    `unknown=${d.unknown}`,
-    `owned=${d.owned}`,
-    `dlc=${d.dlc}`,
+    `unknown_discount=${d.unknownDiscount}`,
+    `unknown_reviews=${d.unknownReviews}`,
+    `partial_metadata=${d.partialMetadata}`,
     `selector_failures=${d.selectorFailures}`,
     `elapsed_ms=${d.elapsedMs}`
   ].join(" ");
@@ -167,9 +175,12 @@ function formatDiagnostics(diagnostics: unknown): string {
 
 function formatOptions(options: FilterOptions): string {
   return [
-    `threshold=${options.threshold}`,
+    `discount=${options.minimumDiscountPercent}`,
+    `review_count=${options.minimumReviewCount}`,
+    `review_grade=${options.minimumReviewGrade}`,
     `enabled=${options.enabled}`,
-    `show_unknown=${options.showUnknown}`,
+    `show_unknown_discount=${options.showUnknownDiscount}`,
+    `show_unknown_reviews=${options.showUnknownReviews}`,
     `show_owned=${options.showOwned}`,
     `show_dlc=${options.showDlc}`
   ].join(" ");
@@ -218,6 +229,6 @@ function printWatchEvent(event: WatchEvent): void {
     STEAM: "debug_endpoint_found",
     TARGET: formatTarget(event.target),
     FILTER: formatDiagnostics(event.diagnostics),
-    NEXT: "Watcher is still running. Unknown/no-discount cards are hidden too."
+    NEXT: "Watcher is still running. Quality filter rules and diagnostics stay in sync."
   });
 }
